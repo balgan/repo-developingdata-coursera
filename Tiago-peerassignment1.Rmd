@@ -1,0 +1,57 @@
+---
+title: "Developing Data Products - Peer Assignment 1"
+author: "Tiago Henriques"
+date: "29/07/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The loaded data was retrieved from this website: http://ourairports.com/data/. The file name is "airports.csv"
+## Load libraries
+
+```{r}
+library(leaflet)
+```
+
+## Load data
+
+Load the CSV file containing the data about all the airports in the world. Filter the dataframe by the type of airport, keeping only small, medium and large airports.
+
+```{r}
+df <- read.csv("/Users/anabarbosa/Downloads/airports.csv", sep = ",", header = TRUE)
+
+df_filtered <- df[,c("type","name","latitude_deg", "longitude_deg")]
+
+table(df_filtered$type)
+
+df_filtered <- df_filtered[(df_filtered$type == "large_airport" | df_filtered$type == "medium_airport") | df_filtered$type == "small_airport", ]
+
+colnames(df_filtered)[3] <- "latitude"
+colnames(df_filtered)[4] <- "longitude"
+
+```
+
+
+## Create map
+
+
+```{r}
+
+pal <- colorFactor(
+  palette = 'Blues',
+  domain = df_filtered$type
+)
+
+map <- df_filtered %>% leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(clusterOptions = markerClusterOptions(), data = df_filtered, lng = ~ longitude, lat = ~ latitude, popup = paste("Airport name:", df_filtered$name, "<br>",
+                           "Size:", df_filtered$type), color = ~pal(type),
+    stroke = FALSE, fillOpacity = 0.5)
+  
+map
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
