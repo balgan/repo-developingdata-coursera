@@ -1,0 +1,55 @@
+---
+title: "Developing Data Products Peer Assignment week 3"
+author: "Tiago Henriques"
+date: "29/07/2018"
+output: ioslides_presentation
+---
+
+## Goal
+
+The goal of this project is to create a web page presentation using R Markdown that features a plot created with Plotly. 
+
+
+## Data
+
+The loaded data was retrieved from this website: http://ourairports.com/data/. The file name is "airports.csv" and contains a lot of information about airports around the world.
+
+For the purpose of this analysis, the data was filtered in order to contain information about large airports only.
+
+
+```{r cars, echo = FALSE, warning=FALSE}
+df <- read.csv("/Users/anabarbosa/Downloads/airports.csv", sep = ",", header = TRUE)
+
+df_filtered <- df[,c("type","name","latitude_deg", "longitude_deg", "iso_country")]
+
+#table(df_filtered$type)
+
+#df_filtered <- df_filtered[df_filtered$iso_country == "US", ]
+
+#df_filtered <- df_filtered[(df_filtered$type == "large_airport" | df_filtered$type == "medium_airport"), ]
+
+#df_filtered <- df_filtered[(df_filtered$type == "large_airport"), ]
+
+
+df_filtered <- df_filtered[complete.cases(df_filtered), ]
+
+df_filtered$name <- as.character(df_filtered$name)
+
+colnames(df_filtered)[3] <- "lat"
+colnames(df_filtered)[4] <- "lon"
+
+
+data_1 <- df_filtered[df_filtered$type %in% c("small_airport", "medium_airport"),]
+
+```
+
+## Large Airports around the world
+
+```{r, echo=FALSE, warning=FALSE}
+suppressPackageStartupMessages(library(plotly))
+
+
+plot_geo(df_filtered, lat = ~lat, lon = ~lon) %>% add_markers(text = ~name, color= toRGB('red'))
+
+```
+
